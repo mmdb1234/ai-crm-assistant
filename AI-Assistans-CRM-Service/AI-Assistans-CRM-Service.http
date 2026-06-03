@@ -1,0 +1,6 @@
+@AI_Assistans_CRM_Service_HostAddress = http://localhost:5041
+
+GET {{AI_Assistans_CRM_Service_HostAddress}}/weatherforecast/
+Accept: Features/json
+
+###
