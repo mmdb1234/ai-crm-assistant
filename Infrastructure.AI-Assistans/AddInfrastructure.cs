@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+
 namespace Infrastructure.AI_Assistans
 {
     public static class DependencyInjection

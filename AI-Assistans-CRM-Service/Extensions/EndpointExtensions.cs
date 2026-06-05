@@ -1,8 +1,10 @@
 ﻿using Features.AI_Assistans.Conversations.GetConversation;
 using Features.AI_Assistans.Conversations.CreateConversation;
+using Features.AI_Assistans.Conversations.GetConversatiosbyUserID;
 
 using Features.AI_Assistans.Messages.GetConversationMessages;
 using Features.AI_Assistans.Users.CreateUser;
+using Features.AI_Assistans.Users.GetUsers;
 using Features.AI_Assistans.Conversations.AnalyzeConversation;
 
 
@@ -21,6 +23,7 @@ namespace AI_Assistans_CRM_Service.Extensions
             app.MapGetConversationEndpoint();
             app.MapGetLatestConversationAnalysisEndpoint();
             app.MapCreateAnalyzeConversationEndpoint();
+            app.MapGetConversationsByUserIDEndpoint();
 
             return app;
         }
@@ -39,6 +42,7 @@ namespace AI_Assistans_CRM_Service.Extensions
             this IEndpointRouteBuilder app)
         {
             app.MapCreateUserEndpoint();
+            app.MapGetUserEndpoint();
             return app;
         }
     }

@@ -1,6 +1,7 @@
 ﻿
 
 using Domain.AI_Assistans.Entities.baseEn;
+using System.Text.Json.Serialization;
 
 namespace Domain.AI_Assistans.Entities
 {
@@ -18,7 +19,6 @@ namespace Domain.AI_Assistans.Entities
 
         public ICollection<Message> Messages { get; set; }
             = new List<Message>();
-
         public ICollection<ConversationAnalysis> Analyses { get; set; }
             = new List<ConversationAnalysis>();
     }

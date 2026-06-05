@@ -1,6 +1,7 @@
 ﻿
 
 using Domain.AI_Assistans.Entities.baseEn;
+using System.Text.Json.Serialization;
 
 namespace Domain.AI_Assistans.Entities
 {
@@ -10,6 +11,7 @@ namespace Domain.AI_Assistans.Entities
 
         public Guid ConversationId { get; set; }
 
+        [JsonIgnore]
         public Conversation? Conversation { get; set; }
 
         public string Summary { get; set; } = default!;
