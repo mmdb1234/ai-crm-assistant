@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.AI_Assistans.Persistence.Configurations
 {
-public class ConversationConfiguration
-    : IEntityTypeConfiguration<Conversation>
+    public class ConversationConfiguration
+        : IEntityTypeConfiguration<Conversation>
     {
         public void Configure(EntityTypeBuilder<Conversation> builder)
         {
@@ -22,6 +22,11 @@ public class ConversationConfiguration
             builder.Property(x => x.Description)
                 .HasMaxLength(1000);
 
+            builder.HasOne(x => x.User)
+                .WithMany(x => x.Conversations)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasMany(x => x.Messages)
                 .WithOne(x => x.Conversation)
                 .HasForeignKey(x => x.ConversationId);
@@ -29,7 +34,10 @@ public class ConversationConfiguration
             builder.HasMany(x => x.Analyses)
                 .WithOne(x => x.Conversation)
                 .HasForeignKey(x => x.ConversationId);
+
+            builder.HasOne(x => x.Company)
+                .WithMany(x => x.Conversations)
+                .HasForeignKey(x => x.CompanyId);
         }
     }
-
 }

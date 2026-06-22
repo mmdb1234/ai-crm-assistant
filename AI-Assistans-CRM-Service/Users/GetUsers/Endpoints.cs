@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace Features.AI_Assistans.Users.GetUsers
 {
@@ -11,11 +12,20 @@ namespace Features.AI_Assistans.Users.GetUsers
             this IEndpointRouteBuilder app)
         {
             app.MapGet("/users", async (
+                ClaimsPrincipal company,
                 [AsParameters] GetRequest request,
-                AppDbContext context,
+                IAppDbContext context,
                 CancellationToken cancellationToken) =>
             {
-                var query = context.Users.AsQueryable();
+
+                var companyIdClaim = company.FindFirst("CompanyId")?.Value;
+
+                if (string.IsNullOrEmpty(companyIdClaim))
+                    return Results.Unauthorized();
+
+                var companyId = int.Parse(companyIdClaim);
+
+                var query = context.Users.Where(u=>u.CompanyId == companyId).AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(request.SearchText))
                 {
@@ -45,6 +55,7 @@ namespace Features.AI_Assistans.Users.GetUsers
                     }).ToList()
                 });
             })
+            .RequireAuthorization()
             .WithName("GetUsers");
 
             return app;

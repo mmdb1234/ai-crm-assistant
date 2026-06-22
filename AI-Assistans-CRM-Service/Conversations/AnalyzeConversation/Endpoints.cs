@@ -3,6 +3,8 @@
 
 
 
+using Features.AI_Assistans.Services;
+
 namespace Features.AI_Assistans.Conversations.AnalyzeConversation
 {
     public static class CreateAnalyzeConversation
@@ -14,9 +16,9 @@ namespace Features.AI_Assistans.Conversations.AnalyzeConversation
                 "/conversations/{conversationId:guid}/analyze",
                 async (
                     Guid conversationId,
-                    [FromServices] IAIAnalysisServiceFactory aiServiceFactory,
-                    [FromQuery] string? provider, 
-                    AppDbContext context,
+                    IAIAnalysisServiceFactory aiServiceFactory,
+                    [FromQuery] string? provider,
+                    IAppDbContext context,
                     CancellationToken cancellationToken) =>
                 {
                     var conversation = await context.Conversations
@@ -57,6 +59,7 @@ namespace Features.AI_Assistans.Conversations.AnalyzeConversation
 
                     return Results.Ok(analysis);
                 })
+            .RequireAuthorization()
             .WithName("AnalyzeConversation");
 
             return app;

@@ -1,43 +1,57 @@
 ﻿
 
 using Domain.AI_Assistans.Entities;
+using System.Text;
 
 namespace Domain.AI_Assistans.Interfaces
 {
-public static class PromptBuilder
+    public static class PromptBuilder
     {
         public static string BuildConversationAnalysisPrompt(
             Conversation conversation)
         {
             var messages = string.Join(
-                "\n",
-                conversation.Messages.Select(x =>
-                    $"{x.Role}: {x.Content}"));
+        "\n",
+        conversation.Messages.Select(x =>
+            $"{x.Role}: {x.Content}"));
 
-            return
-        $"""
-        You are an AI CRM assistant.
+            var sb = new StringBuilder();
 
-        Analyze this customer conversation.
+            sb.AppendLine("You are an AI CRM assistant.");
+            sb.AppendLine();
+            sb.AppendLine("Analyze the following customer conversation.");
+            sb.AppendLine();
+            sb.AppendLine("Conversation:");
+            sb.AppendLine(messages);
+            sb.AppendLine();
+            sb.AppendLine("Return ONLY valid JSON.");
+            sb.AppendLine();
+            sb.AppendLine("Rules:");
+            sb.AppendLine("- leadScore must be integer between 0 and 100");
+            sb.AppendLine("- sentiment must be:");
+            sb.AppendLine("  positive");
+            sb.AppendLine("  neutral");
+            sb.AppendLine("  negative");
+            sb.AppendLine("- no markdown");
+            sb.AppendLine("- no explanation");
+            sb.AppendLine("- no extra text");
+            sb.AppendLine();
+            sb.AppendLine("JSON format:");
+            sb.AppendLine("{");
+            sb.AppendLine("  \"summary\": \"string\",");
+            sb.AppendLine("  \"sentiment\": \"positive\",");
+            sb.AppendLine("  \"leadScore\": 85,");
+            sb.AppendLine("  \"suggestedReply\": \"string\",");
+            sb.AppendLine("  \"suggestedNextAction\": \"string\"");
+            sb.AppendLine("}");
 
-        Conversation:
-        {messages}
+            return sb.ToString();
 
-        Return:
-        1. Summary
-        2. Customer sentiment
-        3. Lead score from 0 to 100
-        4. Suggested reply
-        5. Suggested next action
 
-        Format:
-        SUMMARY:
-        SENTIMENT:
-        LEAD_SCORE:
-        SUGGESTED_REPLY:
-        NEXT_ACTION:
-        """;
         }
     }
-
 }
+
+
+
+

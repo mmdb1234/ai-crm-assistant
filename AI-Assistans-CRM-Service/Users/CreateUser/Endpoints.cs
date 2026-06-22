@@ -1,4 +1,6 @@
 ﻿
+using System.Security.Claims;
+
 namespace Features.AI_Assistans.Users.CreateUser;
 
 public static class CreateUserEndpoint
@@ -7,16 +9,24 @@ public static class CreateUserEndpoint
         this IEndpointRouteBuilder app)
     {
         app.MapPost("/users", async (
+            ClaimsPrincipal company,
             CreateUserRequest request,
-            AppDbContext context,
+            IAppDbContext context,
             CancellationToken cancellationToken) =>
         {
+            var companyIdClaim = company.FindFirst("CompanyId")?.Value;
+
+            if (string.IsNullOrEmpty(companyIdClaim))
+                return Results.Unauthorized();
+
+            var companyId = int.Parse(companyIdClaim);
             var user = new User
             {
                 Id = Guid.NewGuid(),
                 Username = request.UserName,
                 Email = request.Email,
-                PhoneNumber = request.PhoneNumber
+                PhoneNumber = request.PhoneNumber,
+                CompanyId = companyId
             };
 
             await context.Users.AddAsync(
@@ -31,6 +41,7 @@ public static class CreateUserEndpoint
                 UserName = user.Username
             });
         })
+        .RequireAuthorization()
         .WithName("CreateUser");
 
         return app;

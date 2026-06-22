@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application.AI-Assistans\Features.AI-Assistans.csproj" />
     <ProjectReference Include="..\Domain.AI-Assistans\Domain.AI-Assistans.csproj" />
   </ItemGroup>
 

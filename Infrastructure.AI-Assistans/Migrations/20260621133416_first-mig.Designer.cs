@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.AI_Assistans.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260603103803_Firstmig")]
-    partial class Firstmig
+    [Migration("20260621133416_first-mig")]
+    partial class firstmig
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,11 +25,72 @@ namespace Infrastructure.AI_Assistans.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.AI_Assistans.Entities.Company", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyRole")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("Companies", (string)null);
+                });
+
             modelBuilder.Entity("Domain.AI_Assistans.Entities.Conversation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -50,6 +111,8 @@ namespace Infrastructure.AI_Assistans.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.HasIndex("UserId");
 
@@ -75,16 +138,16 @@ namespace Infrastructure.AI_Assistans.Migrations
 
                     b.Property<string>("ModelName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Sentiment")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("SuggestedNextAction")
                         .IsRequired()
@@ -100,8 +163,8 @@ namespace Infrastructure.AI_Assistans.Migrations
 
                     b.Property<string>("Version")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
@@ -147,37 +210,52 @@ namespace Infrastructure.AI_Assistans.Migrations
             modelBuilder.Entity("Domain.AI_Assistans.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text");
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Domain.AI_Assistans.Entities.Conversation", b =>
                 {
+                    b.HasOne("Domain.AI_Assistans.Entities.Company", "Company")
+                        .WithMany("Conversations")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.AI_Assistans.Entities.User", "User")
                         .WithMany("Conversations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
 
                     b.Navigation("User");
                 });
@@ -202,6 +280,24 @@ namespace Infrastructure.AI_Assistans.Migrations
                         .IsRequired();
 
                     b.Navigation("Conversation");
+                });
+
+            modelBuilder.Entity("Domain.AI_Assistans.Entities.User", b =>
+                {
+                    b.HasOne("Domain.AI_Assistans.Entities.Company", "Company")
+                        .WithMany("Users")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("Domain.AI_Assistans.Entities.Company", b =>
+                {
+                    b.Navigation("Conversations");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("Domain.AI_Assistans.Entities.Conversation", b =>

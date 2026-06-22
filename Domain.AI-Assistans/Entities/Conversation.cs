@@ -17,6 +17,10 @@ namespace Domain.AI_Assistans.Entities
 
         public User? User { get; set; }
 
+        public int CompanyId { get; set; }
+        public Company? Company { get; set; }
+
+
         public ICollection<Message> Messages { get; set; }
             = new List<Message>();
         public ICollection<ConversationAnalysis> Analyses { get; set; }

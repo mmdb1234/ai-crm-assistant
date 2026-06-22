@@ -4,4 +4,5 @@ global using Infrastructure.AI_Assistans.Persistence;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 global using Domain.AI_Assistans.Entities;
+global using Features.AI_Assistans.Services;
 

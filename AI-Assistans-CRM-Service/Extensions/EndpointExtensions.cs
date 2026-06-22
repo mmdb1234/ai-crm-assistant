@@ -6,6 +6,9 @@ using Features.AI_Assistans.Messages.GetConversationMessages;
 using Features.AI_Assistans.Users.CreateUser;
 using Features.AI_Assistans.Users.GetUsers;
 using Features.AI_Assistans.Conversations.AnalyzeConversation;
+using AI_Assistans_CRM_Service.Conversations.LoginCompany;
+using AI_Assistans_CRM_Service.Conversations.RefreshToken;
+using AI_Assistans_CRM_Service.Companies.GetCompanyConversations;
 
 
 
@@ -43,6 +46,15 @@ namespace AI_Assistans_CRM_Service.Extensions
         {
             app.MapCreateUserEndpoint();
             app.MapGetUserEndpoint();
+            return app;
+        }
+
+        public static IEndpointRouteBuilder MapCompaniesEndpoints(
+           this IEndpointRouteBuilder app)
+        {
+            app.MapLoginCompanyEndpoint();
+            app.MapRefreshTokenEndpoint();
+            app.MapGetCompanyConversationsEndpoint();
             return app;
         }
     }

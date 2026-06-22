@@ -12,7 +12,7 @@ namespace Features.AI_Assistans.Messages.GetConversationMessages
                 "/conversations/{conversationId:guid}/messages",
                 async (
                     Guid conversationId,
-                    AppDbContext context,
+                    IAppDbContext context,
                     CancellationToken cancellationToken) =>
                 {
                     var messages = await context.Messages

@@ -1,5 +1,7 @@
 ﻿
 
+using Features.AI_Assistans.Services;
+
 namespace Features.AI_Assistans.Conversations.CreateConversation;
 
 public static class CreateConversationEndpoint
@@ -9,7 +11,7 @@ public static class CreateConversationEndpoint
         {
         app.MapPost("/conversations", async (
             CreateConversationRequest request,
-            AppDbContext context,
+            IAppDbContext context,
             CancellationToken cancellationToken) =>
         {
             var conversation = new Conversation
@@ -32,6 +34,7 @@ public static class CreateConversationEndpoint
                 Title = conversation.Title
             });
         })
+        .RequireAuthorization()
         .WithName("CreateConversation");
 
             return app;

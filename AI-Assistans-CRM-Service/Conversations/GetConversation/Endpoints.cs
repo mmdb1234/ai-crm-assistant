@@ -1,5 +1,7 @@
 ﻿
 
+using Features.AI_Assistans.Services;
+
 namespace Features.AI_Assistans.Conversations.GetConversation
 {
     public static class GetConversationEndpoint
@@ -9,7 +11,7 @@ namespace Features.AI_Assistans.Conversations.GetConversation
         {
             app.MapGet("/conversations/{id:guid}", async (
                 Guid id,
-                AppDbContext context,
+                IAppDbContext context,
                 CancellationToken cancellationToken) =>
             {
                 var conversation = await context.Conversations
@@ -25,6 +27,7 @@ namespace Features.AI_Assistans.Conversations.GetConversation
 
                 return Results.Ok(conversation);
             })
+            .RequireAuthorization()
             .WithName("GetConversation");
 
             return app;

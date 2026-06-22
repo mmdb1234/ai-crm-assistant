@@ -1,5 +1,7 @@
 ﻿
 
+using Features.AI_Assistans.Services;
+
 namespace Features.AI_Assistans.Conversations.CreateConversation;
 
 public static class GetLatestConversationAnalysisEndpoint
@@ -12,7 +14,7 @@ public static class GetLatestConversationAnalysisEndpoint
             "/conversations/{conversationId:guid}/analysis/latest",
             async (
                 Guid conversationId,
-                AppDbContext context,
+                IAppDbContext context,
                 CancellationToken cancellationToken) =>
             {
                 var analysis = await context.ConversationAnalyses
@@ -27,6 +29,7 @@ public static class GetLatestConversationAnalysisEndpoint
 
                 return Results.Ok(analysis);
             })
+        .RequireAuthorization()
         .WithName("GetLatestConversationAnalysis");
 
             return app;

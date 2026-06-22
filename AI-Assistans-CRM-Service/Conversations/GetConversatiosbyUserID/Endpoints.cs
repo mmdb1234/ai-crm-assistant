@@ -1,5 +1,5 @@
 ﻿
-using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Features.AI_Assistans.Conversations.GetConversatiosbyUserID
 {
@@ -9,17 +9,26 @@ namespace Features.AI_Assistans.Conversations.GetConversatiosbyUserID
             this IEndpointRouteBuilder app)
         {
             app.MapGet("users/{userid:guid}/conversations", async (
+                ClaimsPrincipal company,
                 [FromRoute] Guid userid,
-                AppDbContext context,
+                IAppDbContext context,
                 CancellationToken cancellationToken) =>
             {
+                var companyIdClaim = company.FindFirst("CompanyId")?.Value;
+
+                if (string.IsNullOrEmpty(companyIdClaim))
+                    return Results.Unauthorized();
+
+                var companyId = int.Parse(companyIdClaim);
+
                 var conversations = await context.Conversations
-                    .Where(c=>c.UserId == userid)
+                    .Where(c=>c.UserId == userid && c.CompanyId == companyId)
                     .ToListAsync(cancellationToken);
 
 
                 return Results.Ok(conversations);
             })
+            .RequireAuthorization()
             .WithName("GetUserConversations");
 
             return app;

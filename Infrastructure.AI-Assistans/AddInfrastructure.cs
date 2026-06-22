@@ -1,8 +1,10 @@
 ﻿
 using Domain.AI_Assistans.Interfaces;
+using Features.AI_Assistans.Services;
 using Infrastructure.AI_Assistans.AI;
 using Infrastructure.AI_Assistans.Factories;
 using Infrastructure.AI_Assistans.Persistence;
+using Infrastructure.AI_Assistans.Persistence.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +23,10 @@ namespace Infrastructure.AI_Assistans
                 options.UseNpgsql(
                     configuration.GetConnectionString("DefaultConnection"));
             });
+            services.AddScoped<IAppDbContext, AppDbContext>(sp =>sp.GetRequiredService<AppDbContext>());
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ITokenService, JwtTokenService>();
+            services.AddScoped<ICompanyRepository, CompanyRepository>();
 
             services.Configure<AIProvidersOptions>(configuration.GetSection("AIProviders"));
 

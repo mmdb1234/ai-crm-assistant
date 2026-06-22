@@ -1,15 +1,16 @@
 ﻿
 using Features.AI_Assistans.Messages.CreateMessage;
+using Features.AI_Assistans.Services;
 
 
-    public static class CreateMessageEndpoint
+public static class CreateMessageEndpoint
     {
         public static IEndpointRouteBuilder MapCreateMessageEndpoint(
             this IEndpointRouteBuilder app)
         {
             app.MapPost("/messages", async (
                 CreateMessageRequest request,
-                AppDbContext context,
+                IAppDbContext context,
                 CancellationToken cancellationToken) =>
             {
                 var conversationExists = await context.Conversations
@@ -42,6 +43,7 @@ using Features.AI_Assistans.Messages.CreateMessage;
                     SentAt = message.SentAt
                 });
             })
+            .RequireAuthorization()
             .WithName("CreateMessage");
 
             return app;

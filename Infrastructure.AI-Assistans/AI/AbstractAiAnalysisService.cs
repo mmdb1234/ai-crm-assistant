@@ -1,17 +1,16 @@
 ﻿
-
 using Domain.AI_Assistans.AI;
 using Domain.AI_Assistans.Entities;
 using Domain.AI_Assistans.Interfaces;
-using System.Text;
 using System.Text.Json;
 
 namespace Infrastructure.AI_Assistans.AI
 {
-public abstract class AbstractAiAnalysisService
-    : IAIAnalysisService
+    public abstract class AbstractAiAnalysisService
+        : IAIAnalysisService
     {
         protected readonly HttpClient _httpClient;
+
         protected readonly AIProviderConfig _config;
 
         protected AbstractAiAnalysisService(
@@ -37,44 +36,41 @@ public abstract class AbstractAiAnalysisService
                 PromptBuilder.BuildConversationAnalysisPrompt(
                     conversation);
 
-            var aiText = await SendPromptAsync(
-                prompt,
-                cancellationToken);
+            var response =
+                await SendPromptAsync(
+                    prompt,
+                    cancellationToken);
 
-            return ParseAnalysis(aiText);
-        }
+            Console.WriteLine("=== AI RESPONSE ===");
+            Console.WriteLine(response);
 
-        protected static ConversationAnalysisResult ParseAnalysis(
-            string text)
-        {
-            return new ConversationAnalysisResult
+            try
             {
-                Summary = Extract(text, "SUMMARY:"),
-                Sentiment = Extract(text, "SENTIMENT:"),
-                SuggestedReply = Extract(text, "SUGGESTED_REPLY:"),
-                SuggestedNextAction = Extract(text, "NEXT_ACTION:"),
-                LeadScore = int.TryParse(
-                    Extract(text, "LEAD_SCORE:"),
-                    out var score)
-                        ? score
-                        : 0
-            };
-        }
+                var result =
+                    JsonSerializer.Deserialize<
+                        ConversationAnalysisResult>(
+                        response,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        });
 
-        protected static string Extract(
-            string text,
-            string key)
-        {
-            var lines = text.Split('\n');
+                if (result is null)
+                {
+                    throw new Exception(
+                        "AI response deserialized to null");
+                }
 
-            var line = lines.FirstOrDefault(x =>
-                x.StartsWith(key));
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("=== JSON PARSE ERROR ===");
+                Console.WriteLine(ex.Message);
 
-            return line?
-                .Replace(key, "")
-                .Trim()
-                ?? "";
+                throw new Exception(
+                    $"Failed to parse AI response: {response}");
+            }
         }
     }
-
 }

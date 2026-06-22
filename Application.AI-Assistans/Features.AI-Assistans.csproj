@@ -8,7 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.AI-Assistans\Infrastructure.AI-Assistans.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain.AI-Assistans\Domain.AI-Assistans.csproj" />
   </ItemGroup>
 
 </Project>
