@@ -34,6 +34,9 @@ namespace Infrastructure.AI_Assistans.Persistence.Configurations
             builder.Property(x => x.CompanyRole)
                 .HasConversion<int>();
 
+            builder.Property(x => x.DailyAnalysisCount)
+                .HasDefaultValue(0);
+
             // Unique Constraints
             builder.HasIndex(x => x.Username)
                 .IsUnique();
@@ -45,7 +48,7 @@ namespace Infrastructure.AI_Assistans.Persistence.Configurations
             builder.HasMany(x => x.Users)
                 .WithOne(x => x.Company)
                 .HasForeignKey(x => x.CompanyId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(x => x.Conversations)
                 .WithOne(x => x.Company)

@@ -12,19 +12,16 @@ namespace Infrastructure.AI_Assistans.Persistence
         }
 
         public DbSet<User> Users => Set<User>();
-
-        public DbSet<Conversation> Conversations => Set<Conversation>();
-
-        public DbSet<Message> Messages => Set<Message>();
-
-        public DbSet<ConversationAnalysis> ConversationAnalyses => Set<ConversationAnalysis>();
         public DbSet<Company> Companies => Set<Company>();
+        public DbSet<Conversation> Conversations => Set<Conversation>();
+        public DbSet<Message> Messages => Set<Message>();
+        public DbSet<ConversationAnalysis> ConversationAnalyses => Set<ConversationAnalysis>();
+        public DbSet<ChatConnection> ChatConnections => Set<ChatConnection>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(
                 typeof(AppDbContext).Assembly);
-
             base.OnModelCreating(modelBuilder);
         }
     }

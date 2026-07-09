@@ -22,6 +22,68 @@ namespace Infrastructure.AI_Assistans.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.AI_Assistans.Entities.ChatConnection", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<Guid?>("ActiveConversationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ConnectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExternalChatId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ExternalUsername")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("Platform")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("WebhookToken")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActiveConversationId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WebhookToken")
+                        .IsUnique()
+                        .HasFilter("[WebhookToken] IS NOT NULL");
+
+                    b.HasIndex("ExternalChatId", "Platform")
+                        .IsUnique();
+
+                    b.ToTable("ChatConnections", (string)null);
+                });
+
             modelBuilder.Entity("Domain.AI_Assistans.Entities.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -36,9 +98,17 @@ namespace Infrastructure.AI_Assistans.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("DailyAnalysisCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime?>("LastAnalysisDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
@@ -188,6 +258,10 @@ namespace Infrastructure.AI_Assistans.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ExternalMessageId")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -196,6 +270,9 @@ namespace Infrastructure.AI_Assistans.Migrations
 
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("SourcePlatform")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -236,6 +313,24 @@ namespace Infrastructure.AI_Assistans.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.AI_Assistans.Entities.ChatConnection", b =>
+                {
+                    b.HasOne("Domain.AI_Assistans.Entities.Conversation", "ActiveConversation")
+                        .WithMany()
+                        .HasForeignKey("ActiveConversationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Domain.AI_Assistans.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ActiveConversation");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.AI_Assistans.Entities.Conversation", b =>

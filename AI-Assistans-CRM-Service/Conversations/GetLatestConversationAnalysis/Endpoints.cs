@@ -2,7 +2,7 @@
 
 using Features.AI_Assistans.Services;
 
-namespace Features.AI_Assistans.Conversations.CreateConversation;
+namespace Features.AI_Assistans.Conversations.GetLatestConversationAnalysis;
 
 public static class GetLatestConversationAnalysisEndpoint
     {

@@ -19,7 +19,7 @@ namespace AI_Assistans_CRM_Service.Conversations.RefreshToken
 
                     return Results.Ok(response);
                 }
-                catch (UnauthorizedAccessException ex)
+                catch (UnauthorizedAccessException)
                 {
                     return Results.Unauthorized();
                 }

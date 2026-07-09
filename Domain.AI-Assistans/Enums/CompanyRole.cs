@@ -5,7 +5,6 @@ namespace Domain.AI_Assistans.Enums
     {
         Owner = 1,
         Manager = 2,
-        Supprt = 3,
-
+        Support = 3
     }
 }

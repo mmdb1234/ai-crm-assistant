@@ -4,7 +4,8 @@ using Features.AI_Assistans.Services;
 using Infrastructure.AI_Assistans.AI;
 using Infrastructure.AI_Assistans.Factories;
 using Infrastructure.AI_Assistans.Persistence;
-using Infrastructure.AI_Assistans.Persistence.Infrastructure.Services;
+using Infrastructure.AI_Assistans.Services;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,7 @@ namespace Infrastructure.AI_Assistans
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<ICompanyRepository, CompanyRepository>();
+            services.AddScoped<IChatConnectionRepository, ChatConnectionRepository>();
 
             services.Configure<AIProvidersOptions>(configuration.GetSection("AIProviders"));
 
@@ -52,6 +54,12 @@ namespace Infrastructure.AI_Assistans
                 IAIAnalysisServiceFactory,
                 AIAnalysisServiceFactory>();
 
+            services.AddSingleton<
+                IChatIngestionService,
+                ChatIngestionService>();
+
+            services.AddHostedService<ChatIngestionService>(sp =>
+                (ChatIngestionService)sp.GetRequiredService<IChatIngestionService>());
 
             return services;
         }

@@ -29,11 +29,12 @@ namespace AI_Assistans_CRM_Service.Companies.GetCompanyConversations
 
                     if (!string.IsNullOrEmpty(request.SearchText))
                     {
-                        query = query.Where(c => c.Title.Contains(request.SearchText) || c.Description.Contains(request.SearchText));
+                        query = query.Where(c => c.Title.Contains(request.SearchText) || (c.Description != null && c.Description.Contains(request.SearchText)));
                     }
 
                     var conversations =  await query
                                             .Include(c=>c.User)
+                                            .Include(c=>c.Analyses)
                                             .OrderByDescending(c=>c.CreatedAt)
                                             .Skip(request.PageSize * request.PageIndex)
                                             .Take(request.PageSize)
@@ -52,7 +53,11 @@ namespace AI_Assistans_CRM_Service.Companies.GetCompanyConversations
                             Description = c.Description,
                             Title = c.Title,
                             UserId = c.UserId,
-                            UserName = c.User.Username
+                            UserName = c.User!.Username,
+                            LatestLeadScore = c.Analyses.OrderByDescending(a => a.CreatedAt).FirstOrDefault()?.LeadScore ?? 0,
+                            LatestSentiment = c.Analyses.OrderByDescending(a => a.CreatedAt).FirstOrDefault()?.Sentiment ?? "N/A",
+                            LatestSummary = c.Analyses.OrderByDescending(a => a.CreatedAt).FirstOrDefault()?.Summary ?? "N/A"
+
                         }).ToList()
                     };
 

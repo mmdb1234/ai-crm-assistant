@@ -1,14 +1,11 @@
-﻿
+﻿using Microsoft.Extensions.DependencyInjection;
 
-using Microsoft.Extensions.DependencyInjection;
+namespace Features.AI_Assistans;
 
-namespace Features.AI_Assistans
+public static class FeaturesDependencyInjection
 {
-    public static class FeaturesDependencyInjection 
-    { 
-        public static IServiceCollection AddFeatures(this IServiceCollection services) 
-        { 
-            return services; 
-        } 
+    public static IServiceCollection AddFeatures(this IServiceCollection services)
+    {
+        return services;
     }
 }

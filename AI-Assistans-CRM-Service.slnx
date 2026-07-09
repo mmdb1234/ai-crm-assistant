@@ -3,4 +3,5 @@
   <Project Path="Application.AI-Assistans/Features.AI-Assistans.csproj" />
   <Project Path="Domain.AI-Assistans/Domain.AI-Assistans.csproj" />
   <Project Path="Infrastructure.AI-Assistans/Infrastructure.AI-Assistans.csproj" />
+  <Project Path="AI-Assistans-CRM-Service.Tests/AI-Assistans-CRM-Service.Tests.csproj" />
 </Solution>

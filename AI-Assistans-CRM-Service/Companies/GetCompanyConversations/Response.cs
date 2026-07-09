@@ -6,7 +6,7 @@ namespace AI_Assistans_CRM_Service.Companies.GetCompanyConversations
     {
         public long TotalCount { get; set; }
          
-        public List<ConversationsDto> Conversations { get; set; }
+        public List<ConversationsDto> Conversations { get; set; } = new();
 
     }
 
@@ -23,5 +23,12 @@ namespace AI_Assistans_CRM_Service.Companies.GetCompanyConversations
         public string? UserName { get; set; }
 
         public int CompanyId { get; set; }
+
+        public string LatestSummary { get; set; } = default!;
+
+        public string LatestSentiment { get; set; } = default!;
+
+        public int LatestLeadScore { get; set; }
+
     }
 }

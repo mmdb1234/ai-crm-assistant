@@ -22,6 +22,7 @@ namespace Features.AI_Assistans.Messages.GetConversationMessages
 
                     return Results.Ok(messages);
                 })
+            .RequireAuthorization()
             .WithName("GetConversationMessages");
 
             return app;

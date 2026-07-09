@@ -1,19 +1,16 @@
-﻿using Features.AI_Assistans.Conversations.GetConversation;
+﻿using Features.AI_Assistans.Conversations.AnalyzeConversation;
 using Features.AI_Assistans.Conversations.CreateConversation;
+using Features.AI_Assistans.Conversations.GetConversation;
 using Features.AI_Assistans.Conversations.GetConversatiosbyUserID;
-
+using Features.AI_Assistans.Conversations.GetLatestConversationAnalysis;
 using Features.AI_Assistans.Messages.GetConversationMessages;
 using Features.AI_Assistans.Users.CreateUser;
 using Features.AI_Assistans.Users.GetUsers;
-using Features.AI_Assistans.Conversations.AnalyzeConversation;
+using AI_Assistans_CRM_Service.Companies.GetCompanyConversations;
+using AI_Assistans_CRM_Service.Companies.RegisterCompany;
 using AI_Assistans_CRM_Service.Conversations.LoginCompany;
 using AI_Assistans_CRM_Service.Conversations.RefreshToken;
-using AI_Assistans_CRM_Service.Companies.GetCompanyConversations;
-
-
-
-
-
+using AI_Assistans_CRM_Service.Webhooks;
 
 namespace AI_Assistans_CRM_Service.Extensions
 {
@@ -53,8 +50,17 @@ namespace AI_Assistans_CRM_Service.Extensions
            this IEndpointRouteBuilder app)
         {
             app.MapLoginCompanyEndpoint();
+            app.MapRegisterCompanyEndpoint();
             app.MapRefreshTokenEndpoint();
             app.MapGetCompanyConversationsEndpoint();
+            return app;
+        }
+
+        public static IEndpointRouteBuilder MapWebhookEndpoints(
+           this IEndpointRouteBuilder app)
+        {
+            app.MapTelegramWebhookEndpoints();
+            app.MapWhatsAppWebhookEndpoints();
             return app;
         }
     }
