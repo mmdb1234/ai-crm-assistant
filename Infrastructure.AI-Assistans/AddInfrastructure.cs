@@ -21,11 +21,27 @@ namespace Infrastructure.AI_Assistans
         {
             services.AddDbContext<AppDbContext>(options =>
             {
-                var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-                Console.WriteLine("DATABASE_URL:");
-                Console.WriteLine(databaseUrl);
-                options.UseNpgsql(
-                     Environment.GetEnvironmentVariable("DATABASE_URL")??configuration.GetConnectionString("DefaultConnection"));
+                //var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                //Console.WriteLine("DATABASE_URL:");
+                //Console.WriteLine(databaseUrl);
+                //options.UseNpgsql(
+                //     Environment.GetEnvironmentVariable("DATABASE_URL")??configuration.GetConnectionString("DefaultConnection"));
+                var host = Environment.GetEnvironmentVariable("PGHOST");
+                var port = Environment.GetEnvironmentVariable("PGPORT");
+                var database = Environment.GetEnvironmentVariable("PGDATABASE");
+                var username = Environment.GetEnvironmentVariable("PGUSER");
+                var password = Environment.GetEnvironmentVariable("PGPASSWORD");
+
+                var connectionString =
+                    $"Host={host};" +
+                    $"Port={port};" +
+                    $"Database={database};" +
+                    $"Username={username};" +
+                    $"Password={password};" +
+                    "SSL Mode=Require;" +
+                    "Trust Server Certificate=true;";
+
+                options.UseNpgsql(connectionString);
             });
             services.AddScoped<IAppDbContext, AppDbContext>(sp =>sp.GetRequiredService<AppDbContext>());
             services.AddScoped<IAuthService, AuthService>();
