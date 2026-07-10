@@ -31,8 +31,9 @@ public class OpenRouterAnalysisService : AbstractAiAnalysisService
         var requestJson = JsonSerializer.Serialize(requestBody);
         var request = new HttpRequestMessage(HttpMethod.Post, _config.BaseUrl);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.ApiKey);
-        request.Headers.Add("HTTP-Referer", "http://localhost");
-        request.Headers.Add("X-Title", "AI Assistant CRM");
+        request.Headers.Add( "HTTP-Referer", "https://ai-crm-assistant-ui-production.up.railway.app");
+
+        request.Headers.Add("X-Title","AI Assistant CRM");
         request.Content = new StringContent(requestJson, Encoding.UTF8, "application/json");
 
         var response = await _httpClient.SendAsync(request, cancellationToken);
