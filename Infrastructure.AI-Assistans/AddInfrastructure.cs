@@ -21,6 +21,9 @@ namespace Infrastructure.AI_Assistans
         {
             services.AddDbContext<AppDbContext>(options =>
             {
+                var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+                Console.WriteLine("DATABASE_URL:");
+                Console.WriteLine(databaseUrl);
                 options.UseNpgsql(
                      Environment.GetEnvironmentVariable("DATABASE_URL")??configuration.GetConnectionString("DefaultConnection"));
             });
