@@ -7,6 +7,7 @@ using Features.AI_Assistans.Services;
 using FluentValidation;
 using Infrastructure.AI_Assistans;
 using Infrastructure.AI_Assistans.Factories;
+using Infrastructure.AI_Assistans.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -120,6 +121,10 @@ app.MapWebhookEndpoints();
 // Database Seeding
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    await db.Database.MigrateAsync();
+
     var context = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
     await AppSeeder.SeedAsync(context);
 }
