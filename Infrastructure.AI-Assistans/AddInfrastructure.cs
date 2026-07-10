@@ -30,7 +30,7 @@ namespace Infrastructure.AI_Assistans
                 var port = Environment.GetEnvironmentVariable("PGPORT");
                 var database = Environment.GetEnvironmentVariable("PGDATABASE");
                 var username = Environment.GetEnvironmentVariable("PGUSER");
-                var password = Environment.GetEnvironmentVariable("PGPASSWORD");
+                var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
 
                 var connectionString =
                     $"Host={host};" +
