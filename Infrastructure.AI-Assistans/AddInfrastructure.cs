@@ -22,7 +22,7 @@ namespace Infrastructure.AI_Assistans
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection"));
+                     Environment.GetEnvironmentVariable("DATABASE_URL")??configuration.GetConnectionString("DefaultConnection"));
             });
             services.AddScoped<IAppDbContext, AppDbContext>(sp =>sp.GetRequiredService<AppDbContext>());
             services.AddScoped<IAuthService, AuthService>();
