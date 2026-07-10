@@ -70,6 +70,14 @@ builder.Services.AddAuthorization();
 // Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
 
+var openRouterKey = builder.Configuration["AIProviders:OpenRouter:ApiKey"];
+
+Console.WriteLine(
+    $"OpenRouter key exists: {!string.IsNullOrEmpty(openRouterKey)}");
+
+Console.WriteLine(
+    $"OpenRouter model: {builder.Configuration["AIProviders:OpenRouter:Model"]}");
+
 // Features / Application
 builder.Services.AddFeatures();
 
