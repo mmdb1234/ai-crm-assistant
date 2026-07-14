@@ -73,6 +73,8 @@ namespace Infrastructure.AI_Assistans
                 IAIAnalysisServiceFactory,
                 AIAnalysisServiceFactory>();
 
+            services.AddScoped<ITelegramBotService, TelegramBotService>();
+
             services.AddSingleton<
                 IChatIngestionService,
                 ChatIngestionService>();

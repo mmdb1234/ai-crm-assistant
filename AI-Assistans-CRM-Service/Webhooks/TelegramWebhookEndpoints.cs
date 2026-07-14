@@ -1,3 +1,5 @@
+using Features.AI_Assistans.Services;
+
 namespace AI_Assistans_CRM_Service.Webhooks;
 
 public static class TelegramWebhookEndpoints
@@ -5,20 +7,33 @@ public static class TelegramWebhookEndpoints
     public static IEndpointRouteBuilder MapTelegramWebhookEndpoints(
         this IEndpointRouteBuilder app)
     {
-        app.MapPost("/webhooks/telegram", async (
+        // Per-user Telegram bot webhook
+        app.MapPost("/webhooks/telegram/{userId:guid}", async (
+            Guid userId,
             TelegramUpdate update,
-            Features.AI_Assistans.Services.IChatIngestionService ingestionService) =>
+            IChatIngestionService ingestionService,
+            Domain.AI_Assistans.Interfaces.IChatConnectionRepository connectionRepo) =>
         {
             if (update.Message?.Text is null)
                 return Results.Ok();
 
-            var chatId = update.Message.Chat.Id.ToString();
-            var username = update.Message.From?.Username ?? update.Message.From?.FirstName;
+            var connection = await connectionRepo.GetByUserAndPlatformAsync(
+                userId, Domain.AI_Assistans.Enums.ChatPlatform.Telegram);
+            if (connection is null)
+                return Results.NotFound();
 
-            ingestionService.Enqueue(new Features.AI_Assistans.Services.IncomingChatMessage(
+            var senderId = update.Message.From?.Id.ToString() ?? "unknown";
+            var senderName = update.Message.From?.Username
+                          ?? update.Message.From?.FirstName;
+
+            var companyId = connection.User.CompanyId;
+
+            ingestionService.Enqueue(new IncomingChatMessage(
+                userId,
+                companyId,
                 Domain.AI_Assistans.Enums.ChatPlatform.Telegram,
-                chatId,
-                username,
+                senderId,
+                senderName,
                 update.Message.Text,
                 update.Message.MessageId.ToString()
             ));
@@ -27,13 +42,13 @@ public static class TelegramWebhookEndpoints
         })
         .AllowAnonymous()
         .WithName("TelegramWebhook")
-        .WithDisplayName("Telegram Webhook")
-        .Produces(200);
+        .WithDisplayName("Telegram Webhook");
 
         return app;
     }
 }
 
+// Minimal Telegram API Update DTOs
 public record TelegramUpdate
 {
     public long UpdateId { get; init; }

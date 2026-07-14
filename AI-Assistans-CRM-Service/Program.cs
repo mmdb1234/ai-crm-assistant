@@ -125,6 +125,7 @@ app.MapMessageEndpoints();
 app.MapUsersEndpoints();
 app.MapCompaniesEndpoints();
 app.MapWebhookEndpoints();
+app.MapBotManagementEndpoints();
 
 // Database Seeding
 using (var scope = app.Services.CreateScope())

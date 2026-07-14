@@ -13,22 +13,23 @@ public class ChatConnection : BaseEntity
 
     public ChatPlatform Platform { get; set; }
 
-    [Required, MaxLength(200)]
-    public string ExternalChatId { get; set; } = default!;
+    // Telegram: bot token (encrypted at rest)
+    [MaxLength(500)]
+    public string? BotToken { get; set; }
 
+    // Telegram: bot username from @BotFather
     [MaxLength(200)]
-    public string? ExternalUsername { get; set; }
+    public string? BotUsername { get; set; }
 
+    // WhatsApp Business: phone number ID
+    [MaxLength(100)]
+    public string? PhoneNumberId { get; set; }
+
+    // WhatsApp: display phone number
     [MaxLength(20)]
-    public string? PhoneNumber { get; set; }
+    public string? BusinessPhone { get; set; }
 
     public bool IsActive { get; set; } = true;
 
-    [MaxLength(200)]
-    public string? WebhookToken { get; set; }
-
     public DateTime ConnectedAt { get; set; } = DateTime.UtcNow;
-
-    public Guid? ActiveConversationId { get; set; }
-    public Conversation? ActiveConversation { get; set; }
 }

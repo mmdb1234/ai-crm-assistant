@@ -12,18 +12,17 @@ public class ChatConnectionConfiguration : IEntityTypeConfiguration<ChatConnecti
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.ExternalChatId)
-            .IsRequired()
+        builder.Property(x => x.BotToken)
+            .HasMaxLength(500);
+
+        builder.Property(x => x.BotUsername)
             .HasMaxLength(200);
 
-        builder.Property(x => x.ExternalUsername)
-            .HasMaxLength(200);
+        builder.Property(x => x.PhoneNumberId)
+            .HasMaxLength(100);
 
-        builder.Property(x => x.PhoneNumber)
+        builder.Property(x => x.BusinessPhone)
             .HasMaxLength(20);
-
-        builder.Property(x => x.WebhookToken)
-            .HasMaxLength(200);
 
         builder.Property(x => x.Platform)
             .HasConversion<int>();
@@ -33,12 +32,6 @@ public class ChatConnectionConfiguration : IEntityTypeConfiguration<ChatConnecti
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(x => x.ActiveConversation)
-            .WithMany()
-            .HasForeignKey(x => x.ActiveConversationId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        builder.HasIndex(x => new { x.ExternalChatId, x.Platform }).IsUnique();
-        builder.HasIndex(x => x.WebhookToken).IsUnique().HasFilter("[WebhookToken] IS NOT NULL");
+        builder.HasIndex(x => x.UserId);
     }
 }

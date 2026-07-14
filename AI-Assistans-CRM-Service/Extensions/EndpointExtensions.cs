@@ -10,6 +10,7 @@ using AI_Assistans_CRM_Service.Companies.GetCompanyConversations;
 using AI_Assistans_CRM_Service.Companies.RegisterCompany;
 using AI_Assistans_CRM_Service.Conversations.LoginCompany;
 using AI_Assistans_CRM_Service.Conversations.RefreshToken;
+using AI_Assistans_CRM_Service.TelegramBots;
 using AI_Assistans_CRM_Service.Webhooks;
 
 namespace AI_Assistans_CRM_Service.Extensions
@@ -61,6 +62,13 @@ namespace AI_Assistans_CRM_Service.Extensions
         {
             app.MapTelegramWebhookEndpoints();
             app.MapWhatsAppWebhookEndpoints();
+            return app;
+        }
+
+        public static IEndpointRouteBuilder MapBotManagementEndpoints(
+           this IEndpointRouteBuilder app)
+        {
+            app.MapRegisterBotEndpoint();
             return app;
         }
     }

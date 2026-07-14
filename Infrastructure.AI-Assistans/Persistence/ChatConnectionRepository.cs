@@ -14,12 +14,11 @@ public class ChatConnectionRepository : IChatConnectionRepository
         _context = context;
     }
 
-    public async Task<ChatConnection?> GetByExternalIdAsync(string externalChatId, ChatPlatform platform)
+    public async Task<ChatConnection?> GetByUserAndPlatformAsync(Guid userId, ChatPlatform platform)
     {
         return await _context.ChatConnections
             .Include(x => x.User)
-            .Include(x => x.ActiveConversation)
-            .FirstOrDefaultAsync(x => x.ExternalChatId == externalChatId
+            .FirstOrDefaultAsync(x => x.UserId == userId
                                    && x.Platform == platform
                                    && x.IsActive);
     }
@@ -31,14 +30,6 @@ public class ChatConnectionRepository : IChatConnectionRepository
             .ToListAsync();
     }
 
-    public async Task<ChatConnection?> GetByWebhookTokenAsync(string token)
-    {
-        return await _context.ChatConnections
-            .Include(x => x.User)
-            .Include(x => x.ActiveConversation)
-            .FirstOrDefaultAsync(x => x.WebhookToken == token && x.IsActive);
-    }
-
     public async Task<ChatConnection> CreateAsync(ChatConnection connection)
     {
         _context.ChatConnections.Add(connection);
@@ -46,12 +37,13 @@ public class ChatConnectionRepository : IChatConnectionRepository
         return connection;
     }
 
-    public async Task UpdateConversationAsync(long connectionId, Guid? conversationId)
+    public async Task UpdateBotTokenAsync(long connectionId, string botToken, string botUsername)
     {
         var connection = await _context.ChatConnections.FindAsync(connectionId);
         if (connection is not null)
         {
-            connection.ActiveConversationId = conversationId;
+            connection.BotToken = botToken;
+            connection.BotUsername = botUsername;
             await _context.SaveChangesAsync();
         }
     }
@@ -64,5 +56,23 @@ public class ChatConnectionRepository : IChatConnectionRepository
             connection.IsActive = false;
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<bool> HasActiveConnectionAsync(Guid userId, ChatPlatform platform)
+    {
+        return await _context.ChatConnections
+            .AnyAsync(x => x.UserId == userId
+                        && x.Platform == platform
+                        && x.IsActive);
+    }
+
+    public async Task<Conversation?> GetActiveConversationBySenderAsync(
+        Guid userId, string externalSenderId, ChatPlatform platform)
+    {
+        return await _context.Conversations
+            .Include(x => x.Messages)
+            .FirstOrDefaultAsync(x => x.UserId == userId
+                                   && x.ExternalSenderId == externalSenderId
+                                   && x.ExternalPlatform == platform);
     }
 }

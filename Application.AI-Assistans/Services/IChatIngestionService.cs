@@ -3,9 +3,11 @@ using Domain.AI_Assistans.Enums;
 namespace Features.AI_Assistans.Services;
 
 public record IncomingChatMessage(
+    Guid UserId,
+    int CompanyId,
     ChatPlatform Platform,
-    string ExternalChatId,
-    string? ExternalUsername,
+    string ExternalSenderId,
+    string? ExternalSenderName,
     string Text,
     string? ExternalMessageId);
 

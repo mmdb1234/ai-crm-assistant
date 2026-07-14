@@ -5,10 +5,11 @@ namespace Domain.AI_Assistans.Interfaces;
 
 public interface IChatConnectionRepository
 {
-    Task<ChatConnection?> GetByExternalIdAsync(string externalChatId, ChatPlatform platform);
+    Task<ChatConnection?> GetByUserAndPlatformAsync(Guid userId, ChatPlatform platform);
     Task<List<ChatConnection>> GetByUserIdAsync(Guid userId);
-    Task<ChatConnection?> GetByWebhookTokenAsync(string token);
     Task<ChatConnection> CreateAsync(ChatConnection connection);
-    Task UpdateConversationAsync(long connectionId, Guid? conversationId);
+    Task UpdateBotTokenAsync(long connectionId, string botToken, string botUsername);
     Task DeactivateAsync(long connectionId);
+    Task<bool> HasActiveConnectionAsync(Guid userId, ChatPlatform platform);
+    Task<Conversation?> GetActiveConversationBySenderAsync(Guid userId, string externalSenderId, ChatPlatform platform);
 }

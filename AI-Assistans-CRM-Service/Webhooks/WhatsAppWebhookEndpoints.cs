@@ -1,3 +1,5 @@
+using Features.AI_Assistans.Services;
+
 namespace AI_Assistans_CRM_Service.Webhooks;
 
 public static class WhatsAppWebhookEndpoints
@@ -5,48 +7,56 @@ public static class WhatsAppWebhookEndpoints
     public static IEndpointRouteBuilder MapWhatsAppWebhookEndpoints(
         this IEndpointRouteBuilder app)
     {
-        // Verification endpoint (required by Meta)
-        app.MapGet("/webhooks/whatsapp", (
+        // WhatsApp webhook verification (Meta required)
+        app.MapGet("/webhooks/whatsapp/{userId:guid}", (
+            Guid userId,
             [FromQuery] string? hubMode,
             [FromQuery] string? hubVerifyToken,
             [FromQuery] string? hubChallenge) =>
         {
             if (hubMode == "subscribe" && hubVerifyToken is not null)
-            {
                 return Results.Ok(hubChallenge);
-            }
+
             return Results.Forbid();
         })
         .AllowAnonymous()
-        .WithName("WhatsAppWebhookVerify")
-        .WithDisplayName("WhatsApp Webhook Verification");
+        .WithName("WhatsAppWebhookVerify");
 
-        // Incoming messages
-        app.MapPost("/webhooks/whatsapp", async (
+        // Per-user WhatsApp incoming messages
+        app.MapPost("/webhooks/whatsapp/{userId:guid}", async (
+            Guid userId,
             WhatsAppWebhookPayload payload,
-            Features.AI_Assistans.Services.IChatIngestionService ingestionService) =>
+            IChatIngestionService ingestionService,
+            Domain.AI_Assistans.Interfaces.IChatConnectionRepository connectionRepo) =>
         {
+            var connection = await connectionRepo.GetByUserAndPlatformAsync(
+                userId, Domain.AI_Assistans.Enums.ChatPlatform.WhatsApp);
+            if (connection is null)
+                return Results.NotFound();
+
+            var companyId = connection.User.CompanyId;
+
             foreach (var entry in payload.Entry)
+            foreach (var change in entry.Changes)
             {
-                foreach (var change in entry.Changes)
+                if (change.Value?.Messages is null) continue;
+
+                foreach (var msg in change.Value.Messages)
                 {
-                    if (change.Value?.Messages is null) continue;
+                    if (msg.Type != "text" || msg.Text?.Body is null) continue;
 
-                    foreach (var msg in change.Value.Messages)
-                    {
-                        if (msg.Type != "text" || msg.Text?.Body is null) continue;
+                    var senderName = change.Value.Metadata?.DisplayPhoneNumber
+                                     ?? change.Value.Metadata?.PhoneNumberId;
 
-                        var phoneNumber = change.Value.Metadata?.DisplayPhoneNumber
-                                         ?? change.Value.Metadata?.PhoneNumberId;
-
-                        ingestionService.Enqueue(new Features.AI_Assistans.Services.IncomingChatMessage(
-                            Domain.AI_Assistans.Enums.ChatPlatform.WhatsApp,
-                            msg.From,
-                            phoneNumber ?? msg.From,
-                            msg.Text.Body,
-                            msg.Id
-                        ));
-                    }
+                    ingestionService.Enqueue(new IncomingChatMessage(
+                        userId,
+                        companyId,
+                        Domain.AI_Assistans.Enums.ChatPlatform.WhatsApp,
+                        msg.From ?? "unknown",
+                        senderName,
+                        msg.Text.Body,
+                        msg.Id
+                    ));
                 }
             }
 
@@ -54,14 +64,13 @@ public static class WhatsAppWebhookEndpoints
         })
         .AllowAnonymous()
         .WithName("WhatsAppWebhook")
-        .WithDisplayName("WhatsApp Webhook")
-        .Produces(200);
+        .WithDisplayName("WhatsApp Webhook");
 
         return app;
     }
 }
 
-// Minimal DTOs for WhatsApp Cloud API webhook payload
+// Minimal WhatsApp Cloud API webhook DTOs
 public record WhatsAppWebhookPayload
 {
     public string? Object { get; init; }
