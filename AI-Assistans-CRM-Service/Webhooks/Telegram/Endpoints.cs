@@ -1,13 +1,12 @@
 using Features.AI_Assistans.Services;
 
-namespace AI_Assistans_CRM_Service.Webhooks;
+namespace AI_Assistans_CRM_Service.Webhooks.Telegram;
 
 public static class TelegramWebhookEndpoints
 {
     public static IEndpointRouteBuilder MapTelegramWebhookEndpoints(
         this IEndpointRouteBuilder app)
     {
-        // Per-user Telegram bot webhook
         app.MapPost("/webhooks/telegram/{userId:guid}", async (
             Guid userId,
             TelegramUpdate update,
@@ -26,11 +25,9 @@ public static class TelegramWebhookEndpoints
             var senderName = update.Message.From?.Username
                           ?? update.Message.From?.FirstName;
 
-            var companyId = connection.User.CompanyId;
-
             ingestionService.Enqueue(new IncomingChatMessage(
                 userId,
-                companyId,
+                connection.User.CompanyId,
                 Domain.AI_Assistans.Enums.ChatPlatform.Telegram,
                 senderId,
                 senderName,
@@ -48,7 +45,6 @@ public static class TelegramWebhookEndpoints
     }
 }
 
-// Minimal Telegram API Update DTOs
 public record TelegramUpdate
 {
     public long UpdateId { get; init; }

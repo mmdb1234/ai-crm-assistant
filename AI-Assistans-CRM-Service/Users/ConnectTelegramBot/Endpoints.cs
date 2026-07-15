@@ -4,15 +4,15 @@ using Domain.AI_Assistans.Enums;
 using Domain.AI_Assistans.Interfaces;
 using Features.AI_Assistans.Services;
 
-namespace AI_Assistans_CRM_Service.TelegramBots;
+namespace AI_Assistans_CRM_Service.Users.ConnectTelegramBot;
 
-public record RegisterBotRequest
+public record ConnectTelegramBotRequest
 {
     [Required, MaxLength(500)]
     public string BotToken { get; init; } = default!;
 }
 
-public record BotResponse
+public record ConnectTelegramBotResponse
 {
     public long Id { get; init; }
     public string? BotUsername { get; init; }
@@ -20,26 +20,27 @@ public record BotResponse
     public DateTime ConnectedAt { get; init; }
 }
 
-public static class RegisterBotEndpoint
+public static class ConnectTelegramBotEndpoints
 {
-    public static IEndpointRouteBuilder MapRegisterBotEndpoint(
+    public static IEndpointRouteBuilder MapConnectTelegramBotEndpoint(
         this IEndpointRouteBuilder app)
     {
-        app.MapPost("/users/me/telegram-bot", async (
-            RegisterBotRequest request,
+        app.MapPost("/users/{userId:guid}/telegram-bot", async (
+            Guid userId,
+            ConnectTelegramBotRequest request,
             IChatConnectionRepository connectionRepo,
             IAppDbContext context,
             ITelegramBotService telegramBotService,
             HttpContext httpContext,
             ClaimsPrincipal user) =>
         {
-            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
+            var companyIdClaim = user.FindFirst("CompanyId")?.Value;
+            if (companyIdClaim is null || !int.TryParse(companyIdClaim, out var companyId))
                 return Results.Unauthorized();
 
             var dbUser = await context.Users.FindAsync(userId);
-            if (dbUser is null)
-                return Results.NotFound(new { error = "User not found" });
+            if (dbUser is null || dbUser.CompanyId != companyId)
+                return Results.NotFound(new { error = "User not found in your company" });
 
             var existing = await connectionRepo.GetByUserAndPlatformAsync(userId, ChatPlatform.Telegram);
             if (existing is not null)
@@ -61,13 +62,13 @@ public static class RegisterBotEndpoint
 
             var created = await connectionRepo.CreateAsync(connection);
 
-            var requestHost = httpContext.Request.Host.Value;
-            var scheme = httpContext.Request.Scheme;
-            var webhookUrl = $"{scheme}://{requestHost}/webhooks/telegram/{userId}";
+            var webhookUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/webhooks/telegram/{userId}";
 
-            await telegramBotService.SetWebhookAsync(request.BotToken, webhookUrl);
+            var webhookSet = await telegramBotService.SetWebhookAsync(request.BotToken, webhookUrl);
+            if (!webhookSet)
+                return Results.Problem("Bot registered but webhook setup failed. Check that the server is publicly accessible via HTTPS.");
 
-            return Results.Created($"/users/me/telegram-bot", new BotResponse
+            return Results.Created($"/users/{userId}/telegram-bot", new ConnectTelegramBotResponse
             {
                 Id = created.Id,
                 BotUsername = created.BotUsername,
@@ -76,9 +77,9 @@ public static class RegisterBotEndpoint
             });
         })
         .RequireAuthorization()
-        .WithName("RegisterTelegramBot")
-        .WithDisplayName("Register Telegram Bot")
-        .Produces<BotResponse>(201)
+        .WithName("ConnectTelegramBot")
+        .WithDisplayName("Connect Telegram Bot")
+        .Produces<ConnectTelegramBotResponse>(201)
         .Produces(400)
         .Produces(401)
         .Produces(404)

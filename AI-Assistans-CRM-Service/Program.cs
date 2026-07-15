@@ -9,6 +9,7 @@ using Infrastructure.AI_Assistans;
 using Infrastructure.AI_Assistans.Factories;
 using Infrastructure.AI_Assistans.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Text;
@@ -70,13 +71,7 @@ builder.Services.AddAuthorization();
 // Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
 
-var openRouterKey = builder.Configuration["AIProviders:OpenRouter:ApiKey"];
 
-Console.WriteLine(
-    $"OpenRouter key exists: {!string.IsNullOrEmpty(openRouterKey)}");
-
-Console.WriteLine(
-    $"OpenRouter model: {builder.Configuration["AIProviders:OpenRouter:Model"]}");
 
 // Features / Application
 builder.Services.AddFeatures();
@@ -96,10 +91,20 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Forwarded headers for ngrok / reverse proxies
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 // Health Checks
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 app.UseCors("frontend");
 
@@ -125,7 +130,7 @@ app.MapMessageEndpoints();
 app.MapUsersEndpoints();
 app.MapCompaniesEndpoints();
 app.MapWebhookEndpoints();
-app.MapBotManagementEndpoints();
+app.MapUserBotEndpoints();
 
 // Database Seeding
 using (var scope = app.Services.CreateScope())

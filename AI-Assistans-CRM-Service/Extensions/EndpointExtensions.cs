@@ -10,8 +10,9 @@ using AI_Assistans_CRM_Service.Companies.GetCompanyConversations;
 using AI_Assistans_CRM_Service.Companies.RegisterCompany;
 using AI_Assistans_CRM_Service.Conversations.LoginCompany;
 using AI_Assistans_CRM_Service.Conversations.RefreshToken;
-using AI_Assistans_CRM_Service.TelegramBots;
-using AI_Assistans_CRM_Service.Webhooks;
+using AI_Assistans_CRM_Service.Users.ConnectTelegramBot;
+using AI_Assistans_CRM_Service.Webhooks.Telegram;
+using AI_Assistans_CRM_Service.Webhooks.WhatsApp;
 
 namespace AI_Assistans_CRM_Service.Extensions
 {
@@ -25,17 +26,14 @@ namespace AI_Assistans_CRM_Service.Extensions
             app.MapGetLatestConversationAnalysisEndpoint();
             app.MapCreateAnalyzeConversationEndpoint();
             app.MapGetConversationsByUserIDEndpoint();
-
             return app;
         }
-
 
         public static IEndpointRouteBuilder MapMessageEndpoints(
            this IEndpointRouteBuilder app)
         {
             app.MapCreateMessageEndpoint();
             app.MapGetConversationMessagesEndpoint();
-
             return app;
         }
 
@@ -65,12 +63,11 @@ namespace AI_Assistans_CRM_Service.Extensions
             return app;
         }
 
-        public static IEndpointRouteBuilder MapBotManagementEndpoints(
+        public static IEndpointRouteBuilder MapUserBotEndpoints(
            this IEndpointRouteBuilder app)
         {
-            app.MapRegisterBotEndpoint();
+            app.MapConnectTelegramBotEndpoint();
             return app;
         }
     }
-
 }

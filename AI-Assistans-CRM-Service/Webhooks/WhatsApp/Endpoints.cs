@@ -1,13 +1,12 @@
 using Features.AI_Assistans.Services;
 
-namespace AI_Assistans_CRM_Service.Webhooks;
+namespace AI_Assistans_CRM_Service.Webhooks.WhatsApp;
 
 public static class WhatsAppWebhookEndpoints
 {
     public static IEndpointRouteBuilder MapWhatsAppWebhookEndpoints(
         this IEndpointRouteBuilder app)
     {
-        // WhatsApp webhook verification (Meta required)
         app.MapGet("/webhooks/whatsapp/{userId:guid}", (
             Guid userId,
             [FromQuery] string? hubMode,
@@ -22,7 +21,6 @@ public static class WhatsAppWebhookEndpoints
         .AllowAnonymous()
         .WithName("WhatsAppWebhookVerify");
 
-        // Per-user WhatsApp incoming messages
         app.MapPost("/webhooks/whatsapp/{userId:guid}", async (
             Guid userId,
             WhatsAppWebhookPayload payload,
@@ -70,7 +68,6 @@ public static class WhatsAppWebhookEndpoints
     }
 }
 
-// Minimal WhatsApp Cloud API webhook DTOs
 public record WhatsAppWebhookPayload
 {
     public string? Object { get; init; }
