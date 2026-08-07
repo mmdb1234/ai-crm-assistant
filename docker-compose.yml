@@ -30,7 +30,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=ai_assistant_db;Username=postgres;Password=postgres
-      Jwt__Key: JWT_KEY:7F1E3C8A5B9D2E4F6A1C7D8B3E5F9A2C6D4E1B8F7A3C5D9E
+      Jwt__Key: 7F1E3C8A5B9D2E4F6A1C7D8B3E5F9A2C6D4E1B8F7A3C5D9E
       Jwt__Issuer: SmartSupport
       Jwt__Audience: SmartSupportClient
     ports:
